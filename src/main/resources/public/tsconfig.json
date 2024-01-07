@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "lib": ["dom", "dom.iterable", "es6"],
+        "module": "es6",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "jsx": "react",
+        "alwaysStrict": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "noImplicitOverride": true,
+        "noEmitOnError": true,
+        "allowJs": true,
+        "noUnusedLocals": true
+        // "traceResolution": true (for tracing module loading, for diagnostics)
+    },
+    "include": [
+        "./ts/**/*"
+    ],
+}

@@ -1,0 +1,68 @@
+@import "variables.scss";
+
+$profileImgSize: 200px;
+$highlightActiveMenuItems: false;
+
+$border-radius-small: 3px;
+$border-radius: 6px;
+$border-radius-large: 10px;
+
+$input-bg: $gray-700;
+$input-color: white;
+$input-color-placeholder: #999;
+
+$mobileHeaderBarHeight: 4.5rem;
+$baseBgColor: black; // rgb(32, 34, 36);
+$body-bg: black; // darken($baseBgColor, 7%);
+$body-color: white;
+$font-size-base: 1rem !default;
+$disabled-body-color: gray; //darken($body-color, 90%);
+$custom-control-indicator-size: 1.75rem; // This gives us awesome large checkboxes and radio buttons!!
+$form-select-indicator-color: lightGray;
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+@import "bootswatch.scss";
+$fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif';
+
+// This does work (border around focused edit fields) but we don't need it.
+/*
+.form-control:focus {
+    border-color: green;
+}
+*/
+
+* {
+    outline: none;
+}
+
+$menuItemHoverBackgroundColor: $primary;
+$nodeBorderBottomColor: $gray-700;
+$dlgBorderColor: var(--bs-green);
+$dlgBorderWidth: 2px;
+$createdByMeBackgroundColor: green;
+$createdByMeTextColor: white;
+$createdByAnotherBackgroundColor: $gray-700;
+$createdByAnotherTextColor: white;
+$listBackgroundColor: lightGray;
+$smallGap: 12px;
+$mediumGap: 18px;
+$bigGap: 24px;
+$tinyGap: 8px;
+$microGap: 4px;
+$smallerFont: 80%;
+$lightenRowFactor: 5;
+$fatBorderSize: 8px;
+$mediumBorderSize: 6px;
+$highlightBorderSize: 8px;
+$smallBorderSize: 3px;
+$mobileHeaderHeight: 3.5rem;
+
+@font-face {
+    font-family: "QuantaCustomFont";
+    src: url('../fonts/Roboto-Light.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+// Import this auto-generated file (see build.sh) which brings in all the imports
+@import 'imports.scss';

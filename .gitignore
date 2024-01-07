@@ -1,0 +1,12 @@
+.classpath
+.project
+.settings/
+.vscode/
+target/
+node_modules/
+src/main/resources/public/node_modules
+src/main/resources/server/node_modules
+src/main/resources/server/build
+src/main/resources/public/dist
+src/main/resources/templates
+src/main/resources/public/node

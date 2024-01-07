@@ -1,0 +1,4 @@
+src/main/resources/public/node_modules
+src/main/resources/public/node
+.git/*
+node_modules

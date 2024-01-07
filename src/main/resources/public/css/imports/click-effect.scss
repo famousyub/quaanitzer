@@ -1,0 +1,101 @@
+/* #mouseEffects (do not delete this tag) */
+
+// *:hover {
+//     outline: 2px solid green;
+// }
+
+div.annotationBox {
+    position: fixed;
+    background-color: yellow;
+    color: black;
+    
+    min-width: 50px;
+    max-width: 600px;
+
+    /* Note: this is 2000 larger than the starting DialogBase.backdropZIndex, so that it can always be on top of all dialogs 
+       but arguably we can to with any super large z-index here to enxure always on top.
+    */
+    z-index: 16002000;
+}
+
+.arrowUp {
+    position: fixed;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid yellow;
+    z-index: 16002000;
+}
+
+.arrowDown {
+    position: fixed;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid yellow;
+    z-index: 16002000;
+}
+
+.arrowRight {
+    position: fixed;
+    width: 0;
+    height: 0;
+    border-top: 60px solid transparent;
+    border-bottom: 60px solid transparent;
+    border-left: 60px solid green;
+    z-index: 16002000;
+}
+
+.arrowLeft {
+    position: fixed;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid blue;
+    z-index: 16002000;
+}
+
+.annotationText {
+    color: black;
+    font-weight: bolder;
+    margin-top: 5px;
+    text-align: center;
+    margin: 0;
+    padding: 5px;
+}
+
+div.clickEffect {
+    position: fixed;
+    border-style: solid;
+    border-color: yellow;
+    border-radius: 50%;
+    /* Warning: must match the time in util.ts#delayFunc AND in runClickAnimation */
+    animation: clickEffect 0.3s ease-out;
+
+    /* Note: this is 2000 larger than the starting DialogBase.backdropZIndex, so that it can always be on top of all dialogs 
+       but arguably we can to with any super large z-index here to enxure always on top.
+    */
+    z-index: 16002000;
+    width: 0;
+    height: 0;
+    border-width: 0;
+}
+
+@keyframes clickEffect {
+    0% {
+        width: 0em;
+        height: 0em;
+        transform: translate(0px, 0px);
+        border-width: 0;
+    }
+
+    100% {
+        width: 66px;
+        height: 66px;
+        transform: translate(-32px, -32px);
+        border-width: 12px;
+    }
+}

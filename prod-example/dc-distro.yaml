@@ -1,0 +1,193 @@
+version: '3.7'
+services:
+    mongo-distro: 
+        hostname: mongo-host-distro
+        networks:
+            bridge:
+                aliases:
+                    - mongo-host-distro
+                    
+        # WARNING: volumes will not handle '~' character for home folder. Do not use.
+        volumes:
+            - '${MONGO_DATA}:/data/db'
+            - '${MONGOD_CONF}:/etc/mongod.conf'
+
+        command: mongod --config /etc/mongod.conf
+
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: ${mongoPassword}
+
+        # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
+        # and we don't want that happening unexpectedly
+        image: mongo:4.0
+
+    # I'm Disabling IPFS for now, because it always just runs for a while and then just mysteriously terminates.
+    # Need to investigate asap (todo-1)
+    # ipfs-distro: 
+    #     # https://hub.docker.com/r/ipfs/kubo/
+    #     image: ipfs/kubo:release
+    #     hostname: ipfs-host-distro
+    #     networks:
+    #         bridge:
+    #             aliases:
+    #                 - ipfs-host-distro
+    #     deploy:
+    #         resources:
+    #             limits:
+    #                 # cpus is a percentage of total power: 1.0==100%
+    #                 cpus: "0.1"
+    #                 memory: 512M
+    #             # reservations:
+    #             #   cpus: 0.25
+    #             #   memory: 128M
+
+    #     environment:
+    #         # IPFS_PROFILE options (lowpower | server)
+    #         IPFS_PROFILE: "server" 
+    #         IPFS_PATH: "/data/ipfs"
+        
+    #     volumes:
+    #         - '${ipfs_staging}:/export'
+    #         - '${ipfs_data}:/data/ipfs'
+
+    #     ports:
+    #         # Allow this thru your firewall: sudo ufw allow 4001
+    #         - "4001:4001"
+    #         - "4001:4001/udp"
+
+    quanta-distro:
+        image: ${DOCKER_IMAGE}
+        build: 
+            context: .
+            args:
+                PORT_SEC: "${PORT_SEC}"
+                PORT: "${PORT}"
+                PORT_DEBUG: "${PORT_DEBUG}"
+                JAR_FILE: "${JAR_FILE}"
+                XMS: "${XMS}"
+                XMX: "${XMX}"
+            dockerfile: ./dockerfile
+
+        hostname: quanta-host
+        networks:
+            bridge:
+                aliases:
+                    - quanta-host
+
+        volumes:
+            - '${DATA_FOLDER}/docs:/docs'
+            - '${DATA_FOLDER}/tmp:/tmp'
+            - '${DATA_FOLDER}/log:/log'
+            - '${DEPLOY_TARGET}/config:/config'
+            - '/etc/letsencrypt/live/${quanta_domain}:/letsencrypt'
+
+        ports:
+            - '${HOST_PORT_SEC}:${PORT_SEC}'
+            - '${HOST_PORT}:${PORT}'
+            - '8000:8000'
+        
+        environment:
+            logging.config: /log/logback.xml
+            XMS: "${XMS}"
+            XMX: "${XMX}"
+
+            adminPassword: "${adminPassword}"
+            mongoPassword: "${mongoPassword}"
+            mongoSecurity: "true"
+
+             # WARNING: Most browsers (other than Firefox) will not support crypto unless you're on HTTPS
+            requireCrypto: "true"
+
+            # NOTE: '>-' removes all newline characters and makes one long string
+            # Using '|' there instead would preserve the newlines after read in
+            # The '-' after either of those removes any trailing newline
+            testUserAccounts: >-
+                FollowBot:${adminPassword}:${devEmail},
+                adam:${testPassword}:${devEmail},
+                bob:${testPassword}:${devEmail},
+                cory:${testPassword}:${devEmail},
+                dan:${testPassword}:${devEmail},
+                eric:${testPassword}:${devEmail}
+
+            nostrCurationAccounts: >-
+                admin,
+                clay
+    
+            throttleTime: "0"
+            spring.config.location: "classpath:/application.properties" 
+            mongodb.host: "${MONGO_HOST}"
+            mongodb.port: "${MONGO_PORT}" 
+
+            instanceId: "prod"
+            profileName: "prod"
+
+            server.port: "${PORT_SEC}" 
+            httpProtocol: "https" 
+            metaHost: "${quanta_domain}" 
+            
+            allowFileSystemSearch: "false"
+            actPubEnabled: "true"
+
+            # tserver-tag
+            nostrDaemonEnabled: "${nostrDaemonEnabled}"
+
+            ipfsEnabled: "${ipfsEnabled}"
+            spring.http.multipart.max-file-size: "200MB" 
+            spring.http.multipart.max-request-size: "200MB" 
+            spring.servlet.multipart.max-file-size: "200MB"
+            spring.servlet.multipart.max-request-size: "200MB"
+            adminDataFolder: "/tmp" 
+
+            # tserver-tag
+            TSERVER_PORT: "${TSERVER_PORT}"
+            TSERVER_API_KEY: "${TSERVER_API_KEY}"
+
+            # Uncomment for debugging... (don't forget to open ufw firewall for port on server)
+            JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
+            
+            ipfs.host: "http://ipfs-host-distro"
+            ipfs.apiPort: "5001"
+            ipfs.gatewayPort: "8080"
+
+            security.require-ssl: "true" 
+            server.ssl.key-store: "/letsencrypt/keystore.p12" 
+            server.ssl.key-store-password: "${prodKeyStorePassword}" 
+            server.ssl.keyStoreType: "PKCS12" 
+            server.ssl.keyAlias: "tomcat" 
+
+            mail.port: ""
+            mail.user: "postmaster@quantizr.com"
+            mail.password: "${emailPassword}" 
+            mail.host: "smtp.mailgun.org" 
+            mail.from: "admin@quanta.wiki"
+
+        depends_on:
+            - mongo-distro
+            # - ipfs-distro
+
+    # tserver-tag
+    tserver-distro:
+        image: ${TSERVER_IMAGE}
+        build:
+            context: ./src/main/resources/server
+            dockerfile: ./Dockerfile
+        hostname: tserver-host
+        networks:
+            bridge:
+                aliases:
+                    - tserver-host
+        volumes:
+            - ./src/main/resources/server/src:/home/node/app/src
+            - ./src/main/resources/server/nodemon.json:/home/node/app/nodemon.json
+        ports:
+            - "${TSERVER_PORT}:${TSERVER_PORT}"
+        environment:
+            TSERVER_PORT: "${TSERVER_PORT}"
+            TSERVER_API_KEY: "${TSERVER_API_KEY}"
+        depends_on:
+            - mongo-distro
+            # - ipfs-distro
+
+networks:
+    bridge:
